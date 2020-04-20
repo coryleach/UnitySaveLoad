@@ -1,0 +1,1 @@
+{ "name": "com.gameframe.saveload.Editor.Tests", "references": [ "com.gameframe.saveload" ], "optionalUnityReferences": ["TestAssemblies"], "includePlatforms": [ "Editor" ], "excludePlatforms": [] }

@@ -1,0 +1,1 @@
+{ "name": "com.gameframe.saveload.Tests", "references": [ "com.gameframe.saveload" ], "optionalUnityReferences": ["TestAssemblies"], "includePlatforms": [], "excludePlatforms": [] }

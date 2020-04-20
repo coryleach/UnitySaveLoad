@@ -1,0 +1,12 @@
+{
+  "name": "com.gameframe.saveload",
+  "displayName": "Gameframe.SaveLoad",
+  "version": "1.0.0",
+  "description": "Serialization helper utility that provides save, load and encryption methods.",
+  "keywords": [],
+  "author": {
+    "name": "Cory Leach",
+    "email": "cory.leach@gmail.com",
+    "url": "https://github.com/coryleach"
+  }
+}
