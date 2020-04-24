@@ -52,7 +52,7 @@ var loadedObject = manager.Load<SavedObjectType>("MySave.data");
 manager.DeleteSave("MySave.data");
 
 //Setup a Custom Save/Load Method by passing any object that implements ISerializationMethod
-manager.SetCustomSerializationMethod(new MyCustomMethod());
+manager.SetCustomSerializationMethod(new MyCustomSerializationMethod());
 
 //Save a ScriptableObject or any object derived from UnityEngine.Object directly to disk
 var myScriptableObject = ScriptableObject.CreateInstance<MyScriptableObjectType>();
