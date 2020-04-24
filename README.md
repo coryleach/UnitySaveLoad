@@ -29,7 +29,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 
 ## Usage
 
-SaveLoadManager supports multiple instances.<br />
+SaveLoadManager is not a singleton. Multiple instances may be used and created.<br />
 In the project tab menu select Create->Gameframe->SaveLoad->SaveLoadManager<br />
 This will create an instance of a SaveLoadManager asset.<br />
 Select the created object and configure options via the inspector.<br />
