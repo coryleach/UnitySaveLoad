@@ -53,7 +53,7 @@ manager.SetCustomSerializationMethod(new MyCustomMethod());
 
 ## Enable Json.Net Support
 
-Ensure the Json.Net for Unity package has been imported.
+Ensure the Json.Net for Unity package has been imported.</br>
 In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 
 ## Author
