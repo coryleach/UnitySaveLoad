@@ -157,6 +157,58 @@ namespace Gameframe.SaveLoad
             return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder);
         }
 
+        /// <summary>
+        /// Saves a unity object to a file.
+        /// First converts the object to JSON using the Unity Json utility.
+        /// Then wraps the json string in an object so that object can be serialized with the normal methods.
+        /// </summary>
+        /// <param name="unityObj">Object to be saved.</param>
+        /// <param name="filename">Name of file to save to</param>
+        /// <param name="folder">Name of folder to save the file in. Uses defualt folder when null.</param>
+        public void SaveUnityObject(UnityEngine.Object unityObj, string filename, string folder = null)
+        {
+            var savedObj = new JsonSerializedUnityObject()
+            {
+                jsonData = JsonUtility.ToJson(unityObj)
+            };
+            
+            Save(savedObj,filename,folder);
+        }
+
+        /// <summary>
+        /// Loads from file and overwrites the given object with the saved values.
+        /// File must have been saved with SaveUnityObject method.
+        /// Uses Unity's JsonUtility and has the same limitations.
+        /// </summary>
+        /// <param name="objectToOverwrite">Object onto which the values from file will be written</param>
+        /// <param name="filename">Name of file to read from.</param>
+        /// <param name="folder">Name of folder containing file. If null the default folder will be used.</param>
+        /// <returns>True when something is loaded. False if file or data was not found.</returns>
+        public bool LoadUnityObjectOverwrite(UnityEngine.Object objectToOverwrite, string filename, string folder = null)
+        {
+            var savedObj = Load<JsonSerializedUnityObject>(filename, folder);
+            
+            if (savedObj == null || string.IsNullOrEmpty(savedObj.jsonData))
+            {
+                return false;
+            }
+            
+            JsonUtility.FromJsonOverwrite(savedObj.jsonData,objectToOverwrite);
+            return true;
+        }
+        
+        /// <summary>
+        /// JsonSerializedUnityObject
+        /// Wrapper for json data created when using Unity's JsonUtility to serialize an object derived from UnityEngine.Object
+        /// This allows us to bypass some of the limitations of BinaryFormatter and serializing unity types such as Vector3, Quaternion etc.
+        /// Many Unity structs are oddly not marked as serializable.
+        /// </summary>
+        [Serializable]
+        private class JsonSerializedUnityObject
+        {
+            public string jsonData = null;
+        }
+
         public bool IsEncrypted => (saveMethod == SerializationMethodType.BinaryEncrypted || saveMethod == SerializationMethodType.UnityJsonEncrypted);
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Gameframe.SaveLoad.Tests
@@ -14,6 +15,13 @@ namespace Gameframe.SaveLoad.Tests
         {
             public List<string> listOfStrings = new List<string>();
             public int count;
+        }
+
+        public class SaveLoadTestUnityObject : ScriptableObject
+        {
+            public string textValue = "";
+            public Vector3 pt;
+            public Quaternion rot;
         }
         
         private static readonly string BaseDirectory = "GameData";
@@ -107,6 +115,57 @@ namespace Gameframe.SaveLoad.Tests
             var loadedObject = manager.Load<SaveLoadTestObject>(filename);
             Assert.IsTrue(loadedObject == null);
             
+            Object.Destroy(manager);
+        }
+
+        [Test]
+        public void CanSaveUnityObject([Values] SerializationMethodType method)
+        {
+            const string filename = "Testfile";
+
+            var manager = CreateManager(method);
+            var testObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
+
+            testObj.textValue = "MyValue";
+
+            manager.SaveUnityObject(testObj,filename);
+           
+            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            Assert.IsTrue(File.Exists(filepath));
+            
+            manager.DeleteSave(filename);
+            Assert.IsFalse(File.Exists(filepath));
+            
+            Object.Destroy(testObj);
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void CanSaveLoadUnityObject([Values] SerializationMethodType method)
+        {
+            const string filename = "Testfile";
+
+            var manager = CreateManager(method);
+            var testObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
+            var loadedTestObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
+
+            testObj.textValue = "MyValue";
+
+            manager.SaveUnityObject(testObj,filename);
+           
+            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            Assert.IsTrue(File.Exists(filepath));
+
+            //var loadedTestObj = manager.Load<SaveLoadTestUnityObject>(filename);
+            //Assert.IsTrue(loadedTestObj != null);
+            manager.LoadUnityObjectOverwrite(loadedTestObj,filename);
+            Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
+            
+            manager.DeleteSave(filename);
+            Assert.IsFalse(File.Exists(filepath));
+            
+            Object.Destroy(testObj);
+            Object.Destroy(loadedTestObj);
             Object.Destroy(manager);
         }
 
