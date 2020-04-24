@@ -45,6 +45,7 @@ manager = SaveLoadManager.Create("BaseDirectory","SaveDirectory",SerializationMe
 manager.Save("MySave.data",objectToBeSaved);
 
 //Load from disk
+//loadedObject will be null if the file does not exist
 var loadedObject = manager.Load<SavedObjectType>("MySave.data");
 
 //Delete saved file
