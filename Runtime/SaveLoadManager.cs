@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Gameframe.SaveLoad
@@ -11,13 +12,13 @@ namespace Gameframe.SaveLoad
     [CreateAssetMenu(menuName = "GameFrame/SaveLoad/SaveLoadManager")]
     public class SaveLoadManager : ScriptableObject
     {
-        [Header("Directories"),SerializeField] private string defaultFolder = "SaveData";
+        [Header("Settings"),SerializeField] private string defaultFolder = "SaveData";
         public string DefaultFolder => defaultFolder;
         
         [SerializeField] private string baseFolder = "GameData";
         public string BaseFolder => baseFolder;
         
-        [Header("Save Method"),SerializeField] private SerializationMethodType saveMethod = SerializationMethodType.Default;
+        [SerializeField] private SerializationMethodType saveMethod = SerializationMethodType.Default;
 
         [Header("Encryption"),SerializeField] protected string key = string.Empty;
         public string Key => key;
@@ -156,7 +157,20 @@ namespace Gameframe.SaveLoad
             return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder);
         }
 
-        public bool IsEncrypted => (saveMethod == SerializationMethodType.BinaryEncrypted || saveMethod == SerializationMethodType.JsonEncrypted);
+        public bool IsEncrypted => (saveMethod == SerializationMethodType.BinaryEncrypted || saveMethod == SerializationMethodType.UnityJsonEncrypted);
+
+        /// <summary>
+        /// Sets a custom serialization method
+        /// </summary>
+        /// <param name="customSerializationMethod"></param>
+        public void SetCustomSerializationMethod(ISerializationMethod customSerializationMethod)
+        {
+            if (_methods == null)
+            {
+                _methods = new Dictionary<SerializationMethodType, ISerializationMethod>();
+            }
+            _methods[SerializationMethodType.Custom] = customSerializationMethod;
+        }
         
         private ISerializationMethod GetSaveLoadMethod(SerializationMethodType methodType)
         {
@@ -174,20 +188,33 @@ namespace Gameframe.SaveLoad
             switch (methodType)
             {
                 case SerializationMethodType.Default:
-                    method = GetSaveLoadMethod(SerializationMethodType.Json);
+                    method = GetSaveLoadMethod(SerializationMethodType.UnityJson);
                     break;
                 case SerializationMethodType.Binary:
                     method = new SerializationMethodBinary();
                     break;
-                case SerializationMethodType.Json:
-                    method = new SerializationMethodJson();
+                case SerializationMethodType.UnityJson:
+                    method = new SerializationMethodUnityJson();
                     break;
+                
                 case SerializationMethodType.BinaryEncrypted:
                     method = new SerializationMethodBinaryEncrypted(key,salt);
                     break;
-                case SerializationMethodType.JsonEncrypted:
-                    method = new SerializationMethodJsonEncrypted(key,salt);
+                case SerializationMethodType.UnityJsonEncrypted:
+                    method = new SerializationMethodUnityJsonEncrypted(key,salt);
                     break;
+                
+#if JSON_DOT_NET
+                case SerializationMethodType.JsonDotNet:
+                    method = new SerializationMethodJsonDotNet();
+                    break;
+                case SerializationMethodType.JsonDotNetEncrypted:
+                    method = new SerializationMethodJsonDotNetEncrypted(key,salt);
+                    break;
+#endif
+                
+                case SerializationMethodType.Custom:
+                    throw new Exception("SaveMethod is Custom but no custom serialization method has been set.");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(methodType), methodType, "SaveLoadMethodType not supported");
             }

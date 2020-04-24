@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 namespace Gameframe.SaveLoad.Tests
@@ -26,11 +23,16 @@ namespace Gameframe.SaveLoad.Tests
 
         private static SaveLoadManager CreateManager(SerializationMethodType method = SerializationMethodType.Default)
         {
-            return SaveLoadManager.Create(BaseDirectory,SaveDirectory,method,TestEncryptionKey, TestEncryptionSalt);
+            var manager = SaveLoadManager.Create(BaseDirectory,SaveDirectory,method,TestEncryptionKey, TestEncryptionSalt);
+            if (method == SerializationMethodType.Custom)
+            {
+                manager.SetCustomSerializationMethod(new SerializationMethodUnityJson());
+            }
+            return manager;
         }
 
         [Test]
-        public void CanCreateManager([Values]SerializationMethodType method)
+        public void CanCreateManager([Values] SerializationMethodType method)
         {
             var manager = CreateManager(method);
             Assert.IsTrue(manager != null);
@@ -92,6 +94,18 @@ namespace Gameframe.SaveLoad.Tests
             
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
+            
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void LoadReturnsNullWhenFileDoesnotExist([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+            const string filename = "Testfile";
+
+            var loadedObject = manager.Load<SaveLoadTestObject>(filename);
+            Assert.IsTrue(loadedObject == null);
             
             Object.Destroy(manager);
         }

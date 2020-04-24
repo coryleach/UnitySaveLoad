@@ -1,15 +1,16 @@
-﻿using System;
+﻿#if JSON_DOT_NET
+
+using System;
 using System.IO;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Gameframe.SaveLoad
 {
-    public class SerializationMethodJson : ISerializationMethod
+    public class SerializationMethodJsonDotNet : ISerializationMethod
     {
         public void Save(object savedObject, FileStream fileStream)
         {
-            //TODO: Using Unity's json serializer... does not support dictionaries. Do better.
-            var json = JsonUtility.ToJson(savedObject);
+            var json = JsonConvert.SerializeObject(savedObject);
             using (var streamWriter = new StreamWriter(fileStream))
             {
                 streamWriter.Write(json);
@@ -25,7 +26,7 @@ namespace Gameframe.SaveLoad
             {
                 var json = streamReader.ReadToEnd();
                 streamReader.Close();
-                loadedObj = JsonUtility.FromJson(json, savedObjectType);
+                loadedObj = JsonConvert.DeserializeObject(json,savedObjectType);
             }
             
             return loadedObj;
@@ -33,4 +34,4 @@ namespace Gameframe.SaveLoad
     }
 }
 
-
+#endif

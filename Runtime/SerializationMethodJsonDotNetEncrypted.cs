@@ -1,15 +1,17 @@
-﻿using System;
+﻿#if JSON_DOT_NET
+
+using System;
 using System.IO;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Gameframe.SaveLoad
 {
-    public class SerializationMethodJsonEncrypted : ISerializationMethodEncrypted
+    public class SerializationMethodJsonDotNetEncrypted : ISerializationMethodEncrypted
     {
         private string _key = null;
         private string _salt = null;
         
-        public SerializationMethodJsonEncrypted(string key, string salt)
+        public SerializationMethodJsonDotNetEncrypted(string key, string salt)
         {
             SetEncryption(key,salt);
         }
@@ -17,7 +19,7 @@ namespace Gameframe.SaveLoad
         public void Save(object savedObject, FileStream fileStream)
         {
             //TODO: Using Unity's json serializer... does not support dictionaries. Do better.
-            var json = JsonUtility.ToJson(savedObject);
+            var json = JsonConvert.SerializeObject(savedObject);
             using (var memoryStream = new MemoryStream())
             {
                 using (var streamWriter = new StreamWriter(memoryStream))
@@ -41,7 +43,7 @@ namespace Gameframe.SaveLoad
                 using (var streamReader = new StreamReader(memoryStream))
                 {
                     var json = streamReader.ReadToEnd();
-                    loadedObj = JsonUtility.FromJson(json, savedObjectType);
+                    loadedObj = JsonConvert.DeserializeObject(json, savedObjectType);
                     streamReader.Close();
                 }
             }
@@ -67,4 +69,4 @@ namespace Gameframe.SaveLoad
     }
 }
 
-
+#endif
