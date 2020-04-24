@@ -6,40 +6,74 @@ namespace Gameframe.SaveLoad
     public static class SaveLoadUtility
     {
         //Default folder name will be used if none is provided.
-        private static string defaultFolderName = "SaveLoad";
+        private const string DefaultFolderName = "SaveLoad";
+        private const string DefaultBaseFolderPath = "GameData";
         
-        private static string baseFolderPath = "/GameData/";
-        public static string BaseFolderPath
+        public static string GetSavePath(string folderName = null, string baseFolderPath = null)
         {
-            get => baseFolderPath;
-            set => baseFolderPath = value;
+            return GetRuntimeSavePath(folderName, baseFolderPath);
+/*#if UNITY_EDITOR
+            return GetEditorSavePath(folderName, baseFolderPath);
+#else
+            return GetRuntimeSavePath(folderName, baseFolderPath);
+#endif*/
         }
-
-        private static string GetSavePath(string folderName = null)
+        
+        public static string GetRuntimeSavePath(string folderName = null, string baseFolderPath = null)
         {
             if (string.IsNullOrEmpty(folderName))
             {
-                folderName = defaultFolderName;
+                folderName = DefaultFolderName;
             }
-            
-            var savePath = Application.persistentDataPath + baseFolderPath;
-            
-#if UNITY_EDITOR
-            savePath = Application.dataPath + baseFolderPath;
-#endif
 
+            if (string.IsNullOrEmpty(baseFolderPath))
+            {
+                baseFolderPath = DefaultBaseFolderPath;
+            }
+
+            var savePath = $"{Application.persistentDataPath}/{baseFolderPath}/";
+            savePath = savePath + folderName + "/";
+            return savePath;
+        }
+        
+        public static string GetEditorSavePath(string folderName = null, string baseFolderPath = null)
+        {
+            if (string.IsNullOrEmpty(folderName))
+            {
+                folderName = DefaultFolderName;
+            }
+
+            if (string.IsNullOrEmpty(baseFolderPath))
+            {
+                baseFolderPath = DefaultBaseFolderPath;
+            }
+
+            var savePath = $"{Application.dataPath}/{baseFolderPath}/";
             savePath = savePath + folderName + "/";
             return savePath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private static string GetSaveFileName(string fileName)
         {
             return fileName;
         }
         
-        public static void Save(object saveObject, ISaveLoadMethod saveLoadMethod, string filename, string folderName = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="saveObject"></param>
+        /// <param name="serializationMethod"></param>
+        /// <param name="filename"></param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        public static void Save(object saveObject, ISerializationMethod serializationMethod, string filename, string folderName = null, string baseFolderPath = null)
         {
-            var savePath = GetSavePath(folderName);
+            var savePath = GetSavePath(folderName,baseFolderPath);
             var saveFilename = GetSaveFileName(filename);
             
             //Create directory if it does not exist
@@ -48,14 +82,25 @@ namespace Gameframe.SaveLoad
                 Directory.CreateDirectory(savePath);
             }
 
-            var saveFile = File.Create(savePath + saveFilename);
-            saveLoadMethod.Save(saveObject,saveFile);
-            saveFile.Close();
+            using (var saveFile = File.Create(savePath + saveFilename))
+            {
+                serializationMethod.Save(saveObject,saveFile);
+                saveFile.Close();
+            }
         }
         
-        public static object Load(System.Type objectType, ISaveLoadMethod saveLoadMethod, string filename, string folderName = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <param name="serializationMethod"></param>
+        /// <param name="filename"></param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        /// <returns></returns>
+        public static object Load(System.Type objectType, ISerializationMethod serializationMethod, string filename, string folderName = null, string baseFolderPath = null)
         {
-            var savePath = GetSavePath(folderName);
+            var savePath = GetSavePath(folderName, baseFolderPath);
             var saveFilename = savePath + GetSaveFileName(filename);
 
             object returnObject = null;
@@ -65,22 +110,60 @@ namespace Gameframe.SaveLoad
                 return null;
             }
 
-            var saveFile = File.Open(saveFilename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            returnObject = saveLoadMethod.Load(objectType, saveFile);
-            saveFile.Close();
+            using (var saveFile = File.Open(saveFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                returnObject = serializationMethod.Load(objectType, saveFile);
+                saveFile.Close();
+            }
             
             return returnObject;
         }
-
-        public static void Delete(string filename, string folderName = null)
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        /// <returns></returns>
+        public static bool Exists(string filename, string folderName = null, string baseFolderPath = null)
         {
-            var savePath = GetSavePath(folderName);
+            var savePath = GetSavePath(folderName, baseFolderPath);
             var saveFilename = savePath + GetSaveFileName(filename);
+            return Directory.Exists(savePath) && File.Exists(saveFilename);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        public static void DeleteSavedFile(string filename, string folderName = null, string baseFolderPath = null)
+        {
+            var saveFilename = GetSavePath(folderName,baseFolderPath) + GetSaveFileName(filename);
             if (File.Exists(saveFilename))
             {
                 File.Delete(saveFilename);
             }
+        }
+
+        public static void DeleteDirectory(string path)
+        {
+            var files = Directory.GetFiles(path);
+            var dirs = Directory.GetDirectories(path);
+
+            foreach (var file in files)
+            {
+                File.Delete(file);
+            }
+
+            foreach (var dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+            
+            Directory.Delete(path,false);
         }
     }
 }
