@@ -35,20 +35,31 @@ This will create an instance of a SaveLoadManager asset.<br />
 Select the created object and configure options via the inspector.<br />
 
 ```C#
-//Save to disk
+//Use the Project tab's create menu GameFrame->SaveLoad->SaveLoadManager to create a manager
+//You can then use public or serialized fields to reference your save system.
+// OR
+//Create a Manager at Runtime like this
+manager = SaveLoadManager.Create("BaseDirectory","SaveDirectory",SerializationMethod.Default);
+
+//Save object to disk in a file named "MySave.data"
 manager.Save("MySave.data",objectToBeSaved);
 
 //Load from disk
 var loadedObject = manager.Load<SavedObjectType>("MySave.data");
 
-//Delete
+//Delete saved file
 manager.DeleteSave("MySave.data");
-
-//Create Manager at Runtime
-manager = SaveLoadManager.Create("BaseDirectory","SaveDirectory",SerializationMethod.Default);
 
 //Setup a Custom Save/Load Method by passing any object that implements ISerializationMethod
 manager.SetCustomSerializationMethod(new MyCustomMethod());
+
+//Save a ScriptableObject or any object derived from UnityEngine.Object directly to disk
+var myScriptableObject = ScriptableObject.CreateInstance<MyScriptableObjectType>();
+manager.SaveUnityObject(myScriptableObject,"MyUnityObjectData.dat");
+
+//Loading a UnityEngine.Object type requires an existing object to overwrite
+//The following method will overwrite all the serialized fields on myScriptableObject with values loaded from disk
+manager.LoadUnityObjectOverwrite(myScriptableObject,"MyUnityObjectData.data");
 ```
 
 ## Enable Json.Net Support
