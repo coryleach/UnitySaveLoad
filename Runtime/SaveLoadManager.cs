@@ -266,7 +266,7 @@ namespace Gameframe.SaveLoad
 #endif
                 
                 case SerializationMethodType.Custom:
-                    throw new Exception("SaveMethod is Custom but no custom serialization method has been set.");
+                    throw new MissingComponentException("SerializationMethodType is Custom but no custom ISerializationMethod was found.");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(methodType), methodType, "SaveLoadMethodType not supported");
             }
