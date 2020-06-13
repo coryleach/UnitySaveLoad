@@ -12,11 +12,6 @@ namespace Gameframe.SaveLoad
         public static string GetSavePath(string folderName = null, string baseFolderPath = null)
         {
             return GetRuntimeSavePath(folderName, baseFolderPath);
-/*#if UNITY_EDITOR
-            return GetEditorSavePath(folderName, baseFolderPath);
-#else
-            return GetRuntimeSavePath(folderName, baseFolderPath);
-#endif*/
         }
         
         public static string GetRuntimeSavePath(string folderName = null, string baseFolderPath = null)
@@ -32,23 +27,6 @@ namespace Gameframe.SaveLoad
             }
 
             var savePath = $"{Application.persistentDataPath}/{baseFolderPath}/";
-            savePath = savePath + folderName + "/";
-            return savePath;
-        }
-        
-        public static string GetEditorSavePath(string folderName = null, string baseFolderPath = null)
-        {
-            if (string.IsNullOrEmpty(folderName))
-            {
-                folderName = DefaultFolderName;
-            }
-
-            if (string.IsNullOrEmpty(baseFolderPath))
-            {
-                baseFolderPath = DefaultBaseFolderPath;
-            }
-
-            var savePath = $"{Application.dataPath}/{baseFolderPath}/";
             savePath = savePath + folderName + "/";
             return savePath;
         }

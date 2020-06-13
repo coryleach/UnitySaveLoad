@@ -26,7 +26,7 @@ namespace Gameframe.SaveLoad
         [SerializeField] protected string salt = string.Empty;
         public string Salt => salt;
         
-        private Dictionary<SerializationMethodType, ISerializationMethod> _methods = null;
+        private Dictionary<SerializationMethodType, ISerializationMethod> _methods;
 
         private void OnEnable()
         {
@@ -167,7 +167,7 @@ namespace Gameframe.SaveLoad
         /// <param name="folder">Name of folder to save the file in. Uses defualt folder when null.</param>
         public void SaveUnityObject(UnityEngine.Object unityObj, string filename, string folder = null)
         {
-            var savedObj = new JsonSerializedUnityObject()
+            var savedObj = new JsonSerializedUnityObject
             {
                 jsonData = JsonUtility.ToJson(unityObj)
             };
@@ -206,7 +206,7 @@ namespace Gameframe.SaveLoad
         [Serializable]
         private class JsonSerializedUnityObject
         {
-            public string jsonData = null;
+            public string jsonData;
         }
 
         public bool IsEncrypted => (saveMethod == SerializationMethodType.BinaryEncrypted || saveMethod == SerializationMethodType.UnityJsonEncrypted);
@@ -266,7 +266,7 @@ namespace Gameframe.SaveLoad
 #endif
                 
                 case SerializationMethodType.Custom:
-                    throw new Exception("SaveMethod is Custom but no custom serialization method has been set.");
+                    throw new MissingComponentException("SerializationMethodType is Custom but no custom ISerializationMethod was found.");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(methodType), methodType, "SaveLoadMethodType not supported");
             }

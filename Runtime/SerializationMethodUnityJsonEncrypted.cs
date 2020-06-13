@@ -6,8 +6,8 @@ namespace Gameframe.SaveLoad
 {
     public class SerializationMethodUnityJsonEncrypted : ISerializationMethodEncrypted
     {
-        private string _key = null;
-        private string _salt = null;
+        private string _key;
+        private string _salt;
         
         public SerializationMethodUnityJsonEncrypted(string key, string salt)
         {
