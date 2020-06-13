@@ -1,10 +1,12 @@
 <h1 align="center">Welcome to com.gameframe.saveload 👋</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.1-blue.svg?cacheSeconds=2592000" />
-  <a href="https://twitter.com/coryleach">
-    <img alt="Twitter: coryleach" src="https://img.shields.io/twitter/follow/coryleach.svg?style=social" target="_blank" />
-  </a>
-</p>
+
+<!-- BADGE-START -->
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d2749fdbc70f422a9d1efccb56d48bff)](https://www.codacy.com/manual/coryleach/UnitySaveLoad?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=coryleach/UnitySaveLoad&amp;utm_campaign=Badge_Grade)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/coryleach/UnitySaveLoad?include_prereleases)
+[![license](https://img.shields.io/github/license/coryleach/UnitySaveLoad)](https://github.com/coryleach/UnitySaveLoad/blob/master/LICENSE)
+
+[![twitter](https://img.shields.io/twitter/follow/coryleach.svg?style=social)](https://twitter.com/coryleach)
+<!-- BADGE-END -->
 
 > This is a simple utility for quickly saving and loading objects to disk in unity.</br></br>
 > Supports Binary, UnityJson, and JsonDotNet.</br>
