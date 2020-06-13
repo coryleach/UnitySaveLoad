@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to com.gameframe.saveload 👋</h1>
+<h1 align="center">Gameframe.SaveLoad 👋</h1>
 
 <!-- BADGE-START -->
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/d2749fdbc70f422a9d1efccb56d48bff)](https://www.codacy.com/manual/coryleach/UnitySaveLoad?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=coryleach/UnitySaveLoad&amp;utm_campaign=Badge_Grade)
@@ -8,19 +8,14 @@
 [![twitter](https://img.shields.io/twitter/follow/coryleach.svg?style=social)](https://twitter.com/coryleach)
 <!-- BADGE-END -->
 
-> This is a simple utility for quickly saving and loading objects to disk in unity.</br></br>
-> Supports Binary, UnityJson, and JsonDotNet.</br>
-> Optionally you can select an encrypted version of each of the above.</br>
-> Additionally custom serialization methods are supported using the ISerializationMethod interface.</br>
-> JsonDotNet support requires the Json.Net for Unity asset store package or Newtonsoft's Json.</br>
-> For info on enabling JsonDotNet support see the <b>Enable Json.Net Support</b> section of this readme.</br>
+Serialization helper utility that supports save, load and encryption.
 
 ## Quick Package Install
 
 #### Using UnityPackageManager (for Unity 2019.3 or later)
 Open the package manager window (menu: Window > Package Manager)<br/>
 Select "Add package from git URL...", fill in the pop-up with the following link:<br/>
-https://github.com/coryleach/UnitySaveLoad.git#1.0.1<br/>
+https://github.com/coryleach/UnitySaveLoad.git#1.0.2<br/>
 
 #### Using UnityPackageManager (for Unity 2019.1 or later)
 
@@ -28,11 +23,16 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 ```js
 {
   "dependencies": {
-    "com.gameframe.saveload": "https://github.com/coryleach/UnitySaveLoad.git#1.0.1",
+    "com.gameframe.saveload": "https://github.com/coryleach/UnitySaveLoad.git#1.0.2",
     ...
   },
 }
 ```
+
+<!-- DOC-START -->
+<!-- 
+Changes between 'DOC START' and 'DOC END' will not be modified by readme update scripts
+-->
 
 ## Usage
 
@@ -75,6 +75,8 @@ manager.LoadUnityObjectOverwrite(myScriptableObject,"MyUnityObjectData.data");
 Ensure the Json.Net for Unity package has been imported.</br>
 In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 
+<!-- DOC-END -->
+
 ## Author
 
 👤 **Cory Leach**
@@ -82,9 +84,10 @@ In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 * Twitter: [@coryleach](https://twitter.com/coryleach)
 * Github: [@coryleach](https://github.com/coryleach)
 
+
 ## Show your support
 
 Give a ⭐️ if this project helped you!
 
 ***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+_This README was generated with ❤️ by [Gameframe.Packages](https://github.com/coryleach/unitypackages)_
