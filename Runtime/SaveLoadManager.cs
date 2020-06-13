@@ -167,7 +167,7 @@ namespace Gameframe.SaveLoad
         /// <param name="folder">Name of folder to save the file in. Uses defualt folder when null.</param>
         public void SaveUnityObject(UnityEngine.Object unityObj, string filename, string folder = null)
         {
-            var savedObj = new JsonSerializedUnityObject()
+            var savedObj = new JsonSerializedUnityObject
             {
                 jsonData = JsonUtility.ToJson(unityObj)
             };
