@@ -26,7 +26,7 @@ namespace Gameframe.SaveLoad
         [SerializeField] protected string salt = string.Empty;
         public string Salt => salt;
         
-        private Dictionary<SerializationMethodType, ISerializationMethod> _methods = null;
+        private Dictionary<SerializationMethodType, ISerializationMethod> _methods;
 
         private void OnEnable()
         {
@@ -206,7 +206,7 @@ namespace Gameframe.SaveLoad
         [Serializable]
         private class JsonSerializedUnityObject
         {
-            public string jsonData = null;
+            public string jsonData;
         }
 
         public bool IsEncrypted => (saveMethod == SerializationMethodType.BinaryEncrypted || saveMethod == SerializationMethodType.UnityJsonEncrypted);

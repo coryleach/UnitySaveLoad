@@ -6,8 +6,8 @@ namespace Gameframe.SaveLoad
 {
     public class SerializationMethodBinaryEncrypted : ISerializationMethod
     {
-        private string _key = null;
-        private string _salt = null;
+        private string _key;
+        private string _salt;
 
         public SerializationMethodBinaryEncrypted(string key, string salt)
         {
