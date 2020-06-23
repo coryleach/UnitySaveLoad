@@ -4,6 +4,7 @@
 <h1 align="center">Gameframe.SaveLoad 👋</h1>
 
 <!-- BADGE-START -->
+[![Build Status](https://travis-ci.org/coryleach/UnitySaveLoad.svg?branch=master)](https://travis-ci.org/coryleach/UnitySaveLoad)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2ba0a4bb579d4a96ac91ab77458f7f76)](https://www.codacy.com/manual/coryleach/UnitySaveLoad?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=coryleach/UnitySaveLoad&amp;utm_campaign=Badge_Grade)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/coryleach/UnitySaveLoad?include_prereleases)
 [![openupm](https://img.shields.io/npm/v/com.gameframe.saveload?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.gameframe.saveload/)
