@@ -35,7 +35,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 ```
 
 <!-- DOC-START -->
-<!-- 
+<!--
 Changes between 'DOC START' and 'DOC END' will not be modified by readme update scripts
 -->
 
@@ -77,7 +77,7 @@ manager.LoadUnityObjectOverwrite(myScriptableObject,"MyUnityObjectData.data");
 
 ## Enable Json.Net Support
 
-Ensure the Json.Net for Unity package has been imported.</br>
+Ensure the <a href="https://assetstore.unity.com/packages/tools/input-management/json-net-for-unity-11347>Json.Net for Unity</a> package has been imported.</br>
 In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 
 <!-- DOC-END -->
