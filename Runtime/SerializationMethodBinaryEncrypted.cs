@@ -58,6 +58,17 @@ namespace Gameframe.SaveLoad
             _key = key;
             _salt = salt;
         }
+        
+        public object Copy(object copyObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, copyObject);
+                stream.Position = 0;
+                return formatter.Deserialize(stream);
+            }
+        }
     }
 }
 

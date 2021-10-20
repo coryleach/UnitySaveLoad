@@ -114,6 +114,34 @@ namespace Gameframe.SaveLoad.Tests
         }
         
         [Test]
+        public void CanCopy([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+
+            var testObject = new SaveLoadTestObject()
+            {
+                listOfStrings = new List<string> {"one", "two"},
+                count = 10,
+            };
+
+            var loadedObject = manager.Copy(testObject);
+            
+            Assert.NotNull(loadedObject);
+            Assert.IsFalse(ReferenceEquals(testObject,loadedObject));
+            Assert.NotNull(loadedObject.listOfStrings);
+            Assert.IsTrue(loadedObject.listOfStrings.Count == testObject.listOfStrings.Count);
+
+            for (int i = 0; i < testObject.listOfStrings.Count; i++)
+            {
+                Assert.IsTrue(testObject.listOfStrings[i] == loadedObject.listOfStrings[i]);
+            }
+            
+            Assert.IsTrue(testObject.count == loadedObject.count);
+            
+            Object.Destroy(manager);
+        }
+        
+        [Test]
         public void LoadReturnsNullWhenFileDoesnotExist([Values] SerializationMethodType method)
         {
             var manager = CreateManager(method);
