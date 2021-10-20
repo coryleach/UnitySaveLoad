@@ -17,6 +17,7 @@ namespace Gameframe.SaveLoad.Tests
             public int count;
         }
 
+        [Serializable]
         public class SaveLoadTestUnityObject : ScriptableObject
         {
             public string textValue = "";
@@ -207,14 +208,31 @@ namespace Gameframe.SaveLoad.Tests
         {
             var manager = CreateManager(method);
             var testObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
-            testObj.textValue = "MyValue";
+            var loadedTestObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
 
-            var loadedTestObj = manager.Copy(testObj);
+            testObj.textValue = "MyValue";
             
+            manager.CopyUnityObjectOverwrite(testObj,loadedTestObj);
+
             Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
             
             Object.Destroy(testObj);
             Object.Destroy(loadedTestObj);
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void CopyThrowsArgumentExceptionOnUnityObject([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+            var testObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                manager.Copy(testObj);
+            });
+            
+            Object.Destroy(testObj);
             Object.Destroy(manager);
         }
 
