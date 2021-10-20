@@ -30,6 +30,27 @@ namespace Gameframe.SaveLoad
             
             return loadedObj;
         }
+        
+        public object Copy(object copyObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var writeJson = JsonUtility.ToJson(copyObject);
+                var streamWriter = new StreamWriter(stream);
+                streamWriter.Write(writeJson);
+                streamWriter.Flush();
+
+                stream.Position = 0;
+                
+                using (var streamReader = new StreamReader(stream))
+                {
+                    var readJson = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    return JsonUtility.FromJson(readJson, copyObject.GetType());
+                }
+            }
+        }
+
     }
 }
 

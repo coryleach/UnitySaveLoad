@@ -16,7 +16,7 @@ namespace Gameframe.SaveLoad
         
         public void Save(object savedObject, FileStream fileStream)
         {
-            //TODO: Using Unity's json serializer... does not support dictionaries. Do better.
+            //Note: Use JsonDotNet method for Dictionary serialization
             var json = JsonUtility.ToJson(savedObject);
             using (var memoryStream = new MemoryStream())
             {
@@ -64,6 +64,27 @@ namespace Gameframe.SaveLoad
             _key = key;
             _salt = salt;
         }
+        
+        public object Copy(object copyObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var writeJson = JsonUtility.ToJson(copyObject);
+                var streamWriter = new StreamWriter(stream);
+                streamWriter.Write(writeJson);
+                streamWriter.Flush();
+
+                stream.Position = 0;
+                
+                using (var streamReader = new StreamReader(stream))
+                {
+                    var readJson = streamReader.ReadToEnd();
+                    streamReader.Close();
+                    return JsonUtility.FromJson(readJson, copyObject.GetType());
+                }
+            }
+        }
+        
     }
 }
 

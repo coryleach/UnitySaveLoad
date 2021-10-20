@@ -9,6 +9,7 @@ namespace Gameframe.SaveLoad
     {
         void Save(object savedObject, FileStream fileStream);
         object Load(System.Type savedObjectType, FileStream fileStream);
+        object Copy(object copyObject);
     }
 }
 

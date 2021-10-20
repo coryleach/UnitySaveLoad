@@ -32,6 +32,18 @@ namespace Gameframe.SaveLoad
             loadedObj = formatter.Deserialize(fileStream);
             return loadedObj;
         }
+        
+        public object Copy(object copyObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, copyObject);
+                stream.Position = 0;
+                return formatter.Deserialize(stream);
+            }
+        }
+
     }
 }
 

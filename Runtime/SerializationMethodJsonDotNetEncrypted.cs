@@ -66,6 +66,27 @@ namespace Gameframe.SaveLoad
             _key = key;
             _salt = salt;
         }
+        
+        public object Copy(object copyObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var writeJson = JsonConvert.SerializeObject(copyObject);
+            
+                var streamWriter = new StreamWriter(stream);
+                streamWriter.Write(writeJson);
+                streamWriter.Flush();
+
+                stream.Position = 0;
+
+                using (var streamReader = new StreamReader(stream))
+                {
+                    var readJson = streamReader.ReadToEnd();
+                    return JsonConvert.DeserializeObject(readJson, copyObject.GetType());
+                }
+            }
+        }
+
     }
 }
 

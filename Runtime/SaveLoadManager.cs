@@ -73,6 +73,29 @@ namespace Gameframe.SaveLoad
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             SaveLoadUtility.Save(obj,saveLoadMethod,filename,folder, baseFolder);
         }
+
+        /// <summary>
+        /// Creat a copy of an object by serializing and deserializing it
+        /// </summary>
+        /// <param name="obj">object to be copied</param>
+        /// <returns>duplicated instance</returns>
+        public object Copy(object obj)
+        {
+            var saveLoadMethod = GetSaveLoadMethod(saveMethod);
+            return saveLoadMethod.Copy(obj);
+        }
+
+        /// <summary>
+        /// Creat a copy of an object by serializing and deserializing it
+        /// </summary>
+        /// <param name="obj">object to be copied</param>
+        /// <typeparam name="T">Type of object to be copied.</typeparam>
+        /// <returns>duplicated instance</returns>
+        public T Copy<T>(T obj)
+        {
+            var saveLoadMethod = GetSaveLoadMethod(saveMethod);
+            return (T)saveLoadMethod.Copy(obj);
+        }
         
         /// <summary>
         /// Load an object from disk
