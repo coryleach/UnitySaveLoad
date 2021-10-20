@@ -1,11 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 namespace Gameframe.SaveLoad.Editor
 {
+    /// <summary>
+    /// Editor for SaveLoadManager
+    /// </summary>
     [CustomEditor(typeof(SaveLoadManager))]
     public class SaveLoadManagerEditor : UnityEditor.Editor
     {
