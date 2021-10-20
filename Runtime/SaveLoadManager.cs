@@ -9,7 +9,7 @@ namespace Gameframe.SaveLoad
     /// SaveLoadManager
     /// Manager for saving and loading objects to/from disk.
     /// </summary>
-    [CreateAssetMenu(menuName = "GameFrame/SaveLoad/SaveLoadManager")]
+    [CreateAssetMenu(menuName = "Gameframe/SaveLoad/SaveLoadManager")]
     public class SaveLoadManager : ScriptableObject
     {
         [Header("Settings"),SerializeField] private string defaultFolder = "SaveData";
