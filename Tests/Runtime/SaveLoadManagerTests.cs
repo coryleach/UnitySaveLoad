@@ -24,6 +24,13 @@ namespace Gameframe.SaveLoad.Tests
             public Quaternion rot;
         }
         
+        [Serializable]
+        public class SaveLoadDictionaryTestObject
+        {
+            public Dictionary<string, int> dict = new Dictionary<string, int>();
+            public string name = "";
+        }
+        
         private static readonly string BaseDirectory = "GameData";
         private static readonly string SaveDirectory = "SaveData";
         private static readonly string TestEncryptionKey = "SaveLoadTestEncryptionKey";
@@ -169,6 +176,49 @@ namespace Gameframe.SaveLoad.Tests
             Object.Destroy(manager);
         }
 
+        [Test]
+        public void CanSaveAndLoadDictionary([Values(
+            SerializationMethodType.Binary,
+            SerializationMethodType.BinaryEncrypted
+#if JSON_DOT_NET
+            ,SerializationMethodType.JsonDotNet,
+            SerializationMethodType.JsonDotNetEncrypted
+#endif
+            )] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+
+            var testObject = new SaveLoadDictionaryTestObject()
+            {
+                dict = new Dictionary<string,int>
+                {
+                    {"one", 1}, 
+                    {"two", 2}
+                },
+                name = "Test",
+            };
+
+            const string filename = "Testfile";
+            
+            manager.Save(testObject,filename);
+
+            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            Assert.IsTrue(File.Exists(filepath));
+
+            var loadedObject = manager.Load<SaveLoadDictionaryTestObject>(filename);
+            
+            Assert.IsTrue(loadedObject.name == testObject.name);
+            Assert.IsTrue(loadedObject.dict.Count == testObject.dict.Count);
+            Assert.IsTrue(loadedObject.dict.ContainsKey("one"));
+            Assert.IsTrue(loadedObject.dict.ContainsKey("two"));
+            Assert.IsTrue(loadedObject.dict["one"] == 1);
+            Assert.IsTrue(loadedObject.dict["two"] == 2);
+
+            manager.DeleteSave(filename);
+            Assert.IsFalse(File.Exists(filepath));
+            
+            Object.Destroy(manager);
+        }
         
     }
 }
