@@ -75,7 +75,8 @@ namespace Gameframe.SaveLoad
         }
 
         /// <summary>
-        /// Creat a copy of an object by serializing and deserializing it
+        /// Creat a copy of an object by serializing and deserializing it.
+        /// Not compatible with unity objects.
         /// </summary>
         /// <param name="obj">object to be copied</param>
         /// <returns>duplicated instance</returns>
@@ -86,7 +87,8 @@ namespace Gameframe.SaveLoad
         }
 
         /// <summary>
-        /// Creat a copy of an object by serializing and deserializing it
+        /// Creat a copy of an object by serializing and deserializing it.
+        /// Not compatible with Unity objects.
         /// </summary>
         /// <param name="obj">object to be copied</param>
         /// <typeparam name="T">Type of object to be copied.</typeparam>

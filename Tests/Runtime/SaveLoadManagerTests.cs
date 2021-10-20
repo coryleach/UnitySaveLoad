@@ -190,14 +190,28 @@ namespace Gameframe.SaveLoad.Tests
            
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
-
-            //var loadedTestObj = manager.Load<SaveLoadTestUnityObject>(filename);
-            //Assert.IsTrue(loadedTestObj != null);
+            
             manager.LoadUnityObjectOverwrite(loadedTestObj,filename);
             Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
             
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
+            
+            Object.Destroy(testObj);
+            Object.Destroy(loadedTestObj);
+            Object.Destroy(manager);
+        }
+
+        [Test]
+        public void CanCopyUnityObject([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+            var testObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
+            testObj.textValue = "MyValue";
+
+            var loadedTestObj = manager.Copy(testObj);
+            
+            Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
             
             Object.Destroy(testObj);
             Object.Destroy(loadedTestObj);
