@@ -77,7 +77,7 @@ manager.LoadUnityObjectOverwrite(myScriptableObject,"MyUnityObjectData.data");
 
 ## Enable Json.Net Support
 
-Ensure the <a href="https://assetstore.unity.com/packages/tools/input-management/json-net-for-unity-11347>Json.Net for Unity</a> package has been imported.</br>
+Ensure the [Json.Net for Unity](https://assetstore.unity.com/packages/tools/input-management/json-net-for-unity-11347) package has been imported.</br>
 In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 
 <!-- DOC-END -->
