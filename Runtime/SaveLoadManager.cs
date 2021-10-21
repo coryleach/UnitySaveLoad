@@ -80,6 +80,10 @@ namespace Gameframe.SaveLoad
         /// <returns>list of file names (excludes the path)</returns>
         public string[] GetFiles(string folder = null)
         {
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
             return SaveLoadUtility.GetSavedFiles(folder,baseFolder);
         }
 
