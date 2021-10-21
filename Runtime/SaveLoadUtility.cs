@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace Gameframe.SaveLoad
@@ -66,9 +68,9 @@ namespace Gameframe.SaveLoad
                 saveFile.Close();
             }
         }
-        
+
         /// <summary>
-        /// 
+        /// Load object from file
         /// </summary>
         /// <param name="objectType"></param>
         /// <param name="serializationMethod"></param>
@@ -98,7 +100,33 @@ namespace Gameframe.SaveLoad
         }
         
         /// <summary>
-        /// 
+        /// Enumerate files in the save directory
+        /// </summary>
+        /// <param name="folderName">folder containing the save files</param>
+        /// <param name="baseFolderPath">base path to the folder</param>
+        /// <returns>list of file names</returns>
+        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null)
+        {
+            var savePath = GetSavePath(folderName,baseFolderPath);
+            foreach ( var file in Directory.EnumerateFiles(savePath,"*",SearchOption.AllDirectories) )
+            {
+                yield return Path.GetFileName(file);
+            }
+        }
+        
+        /// <summary>
+        /// Creates an array list of save files in the given folder and path
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        /// <returns>Array of file names</returns>
+        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null)
+        {
+            return EnumerateSavedFiles(folderName, baseFolderPath).ToArray();
+        }
+        
+        /// <summary>
+        /// Check if a saved file exists
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="folderName"></param>
@@ -112,7 +140,7 @@ namespace Gameframe.SaveLoad
         }
 
         /// <summary>
-        /// 
+        /// Delete a savedd file
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="folderName"></param>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Gameframe.SaveLoad
@@ -75,24 +74,48 @@ namespace Gameframe.SaveLoad
         }
 
         /// <summary>
-        /// Creat a copy of an object by serializing and deserializing it
+        /// Gets the list of save files that have been created
+        /// </summary>
+        /// <param name="folder">sub folder</param>
+        /// <returns>list of file names (excludes the path)</returns>
+        public string[] GetFiles(string folder = null)
+        {
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder);
+        }
+
+        /// <summary>
+        /// Creat a copy of an object by serializing and deserializing it.
+        /// Not compatible with unity objects.
         /// </summary>
         /// <param name="obj">object to be copied</param>
         /// <returns>duplicated instance</returns>
         public object Copy(object obj)
         {
+            if (obj is UnityEngine.Object)
+            {
+                throw new ArgumentException("UnityEngine.Object and child types not supported by copy method.");
+            }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             return saveLoadMethod.Copy(obj);
         }
 
         /// <summary>
-        /// Creat a copy of an object by serializing and deserializing it
+        /// Creat a copy of an object by serializing and deserializing it.
+        /// Not compatible with Unity objects.
         /// </summary>
         /// <param name="obj">object to be copied</param>
         /// <typeparam name="T">Type of object to be copied.</typeparam>
         /// <returns>duplicated instance</returns>
         public T Copy<T>(T obj)
         {
+            if (obj is UnityEngine.Object)
+            {
+                throw new ArgumentException("UnityEngine.Object and child types not supported by copy method.");
+            }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             return (T)saveLoadMethod.Copy(obj);
         }
@@ -218,6 +241,17 @@ namespace Gameframe.SaveLoad
             
             JsonUtility.FromJsonOverwrite(savedObj.jsonData,objectToOverwrite);
             return true;
+        }
+
+        /// <summary>
+        /// Copies the serializable fields from one UnityEngine.Object to another
+        /// </summary>
+        /// <param name="toCopy">object which should be copied</param>
+        /// <param name="toOverwrite">object onto which copied fields should be written</param>
+        public void CopyUnityObjectOverwrite(UnityEngine.Object toCopy, UnityEngine.Object toOverwrite)
+        {
+            var jsonData = JsonUtility.ToJson(toCopy);
+            JsonUtility.FromJsonOverwrite(jsonData,toOverwrite);
         }
         
         /// <summary>
