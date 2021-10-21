@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Gameframe.SaveLoad
@@ -72,6 +71,16 @@ namespace Gameframe.SaveLoad
             }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             SaveLoadUtility.Save(obj,saveLoadMethod,filename,folder, baseFolder);
+        }
+
+        /// <summary>
+        /// Gets the list of save files that have been created
+        /// </summary>
+        /// <param name="folder">sub folder</param>
+        /// <returns>list of file names (excludes the path)</returns>
+        public string[] GetFiles(string folder = null)
+        {
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder);
         }
 
         /// <summary>
