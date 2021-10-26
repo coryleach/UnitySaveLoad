@@ -1,7 +1,7 @@
 {
   "name": "com.gameframe.saveload",
   "displayName": "Gameframe.SaveLoad",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Serialization helper utility that supports save, load and encryption.",
   "keywords": [],
   "author": {
