@@ -108,6 +108,13 @@ namespace Gameframe.SaveLoad
         public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null)
         {
             var savePath = GetSavePath(folderName,baseFolderPath);
+            
+            //If directory does not exist we're done
+            if (!Directory.Exists(savePath))
+            {
+                yield break;
+            }
+            
             foreach ( var file in Directory.EnumerateFiles(savePath,"*",SearchOption.AllDirectories) )
             {
                 yield return Path.GetFileName(file);
