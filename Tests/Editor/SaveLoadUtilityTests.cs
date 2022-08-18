@@ -27,7 +27,6 @@ namespace Gameframe.SaveLoad.Tests
                 case SerializationMethodType.UnityJsonEncrypted:
                     return new SerializationMethodUnityJsonEncrypted(TestKey,TestSalt);
 #if JSON_DOT_NET
-
                 case SerializationMethodType.JsonDotNet:
                     return new SerializationMethodJsonDotNet();
                 case SerializationMethodType.JsonDotNetEncrypted:
@@ -84,6 +83,29 @@ namespace Gameframe.SaveLoad.Tests
             SaveLoadUtility.Save(testSave,serializationMethod,filename,folder);
 
             var files = SaveLoadUtility.GetSavedFiles(folder);
+            Assert.IsTrue(files.Length == 1);
+
+            //Files should contain a list of names that exactly match the file name used
+            //omits the path of the file
+            Assert.IsTrue(files[0] == filename);
+
+            SaveLoadUtility.DeleteSavedFile(filename,folder);
+
+            files = SaveLoadUtility.GetSavedFiles();
+            Assert.IsTrue(files.Length == 0);
+        }
+
+        [Test]
+        public void CanGetFilesWithExtension()
+        {
+            var testSave = new SaveLoadTestObject() {testData = "SaveFileExists"};
+            var serializationMethod = GetSerializationMethod(SerializationMethodType.Binary);
+            var filename = "TestSave.sav";
+            var folder = "TestFolder";
+
+            SaveLoadUtility.Save(testSave,serializationMethod,filename,folder);
+
+            var files = SaveLoadUtility.GetSavedFiles(folder,null, "sav");
             Assert.IsTrue(files.Length == 1);
 
             //Files should contain a list of names that exactly match the file name used

@@ -10,12 +10,12 @@ namespace Gameframe.SaveLoad
         //Default folder name will be used if none is provided.
         private const string DefaultFolderName = "SaveLoad";
         private const string DefaultBaseFolderPath = "GameData";
-        
+
         public static string GetSavePath(string folderName = null, string baseFolderPath = null)
         {
             return GetRuntimeSavePath(folderName, baseFolderPath);
         }
-        
+
         public static string GetRuntimeSavePath(string folderName = null, string baseFolderPath = null)
         {
             if (string.IsNullOrEmpty(folderName))
@@ -34,7 +34,7 @@ namespace Gameframe.SaveLoad
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
@@ -42,9 +42,9 @@ namespace Gameframe.SaveLoad
         {
             return fileName;
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="saveObject"></param>
         /// <param name="serializationMethod"></param>
@@ -55,7 +55,7 @@ namespace Gameframe.SaveLoad
         {
             var savePath = GetSavePath(folderName,baseFolderPath);
             var saveFilename = GetSaveFileName(filename);
-            
+
             //Create directory if it does not exist
             if (!Directory.Exists(savePath))
             {
@@ -95,43 +95,46 @@ namespace Gameframe.SaveLoad
                 returnObject = serializationMethod.Load(objectType, saveFile);
                 saveFile.Close();
             }
-            
+
             return returnObject;
         }
-        
+
         /// <summary>
         /// Enumerate files in the save directory
         /// </summary>
         /// <param name="folderName">folder containing the save files</param>
         /// <param name="baseFolderPath">base path to the folder</param>
+        /// <param name="extension">include only files with the specified extension</param>
         /// <returns>list of file names</returns>
-        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null)
+        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null)
         {
             var savePath = GetSavePath(folderName,baseFolderPath);
-            
+
             //If directory does not exist we're done
             if (!Directory.Exists(savePath))
             {
                 yield break;
             }
-            
-            foreach ( var file in Directory.EnumerateFiles(savePath,"*",SearchOption.AllDirectories) )
+
+            var searchPattern = string.IsNullOrEmpty(extension) ? "*" : $"*.{extension}";
+            foreach ( var file in Directory.EnumerateFiles(savePath,searchPattern,SearchOption.AllDirectories) )
             {
                 yield return Path.GetFileName(file);
             }
         }
-        
+
         /// <summary>
         /// Creates an array list of save files in the given folder and path
         /// </summary>
-        /// <param name="folderName"></param>
-        /// <param name="baseFolderPath"></param>
+        /// <param name="folderName">folder containing the save files</param>
+        /// <param name="baseFolderPath">base path to the folder</param>
+        /// <param name="extension">include only files with this extension</param>
         /// <returns>Array of file names</returns>
-        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null)
+        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null)
         {
-            return EnumerateSavedFiles(folderName, baseFolderPath).ToArray();
+            return EnumerateSavedFiles(folderName, baseFolderPath, extension).ToArray();
         }
-        
+
         /// <summary>
         /// Check if a saved file exists
         /// </summary>
@@ -175,10 +178,8 @@ namespace Gameframe.SaveLoad
             {
                 DeleteDirectory(dir);
             }
-            
+
             Directory.Delete(path,false);
         }
     }
 }
-
-
