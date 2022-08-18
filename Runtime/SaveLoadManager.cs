@@ -13,18 +13,18 @@ namespace Gameframe.SaveLoad
     {
         [Header("Settings"),SerializeField] private string defaultFolder = "SaveData";
         public string DefaultFolder => defaultFolder;
-        
+
         [SerializeField] private string baseFolder = "GameData";
         public string BaseFolder => baseFolder;
-        
+
         [SerializeField] private SerializationMethodType saveMethod = SerializationMethodType.Default;
 
         [Header("Encryption"),SerializeField] protected string key = string.Empty;
         public string Key => key;
-        
+
         [SerializeField] protected string salt = string.Empty;
         public string Salt => salt;
-        
+
         private Dictionary<SerializationMethodType, ISerializationMethod> _methods;
 
         private void OnEnable()
@@ -53,10 +53,10 @@ namespace Gameframe.SaveLoad
             instance.key = key;
             instance.salt = salt;
             instance.saveMethod = saveMethod;
-            
+
             return instance;
         }
-        
+
         /// <summary>
         /// Save an object to disk
         /// </summary>
@@ -77,14 +77,15 @@ namespace Gameframe.SaveLoad
         /// Gets the list of save files that have been created
         /// </summary>
         /// <param name="folder">sub folder</param>
+        /// <param name="extension">include only files with this extension</param>
         /// <returns>list of file names (excludes the path)</returns>
-        public string[] GetFiles(string folder = null)
+        public string[] GetFiles(string folder = null, string extension = null)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
-            return SaveLoadUtility.GetSavedFiles(folder,baseFolder);
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, extension);
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace Gameframe.SaveLoad
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             return (T)saveLoadMethod.Copy(obj);
         }
-        
+
         /// <summary>
         /// Load an object from disk
         /// </summary>
@@ -162,7 +163,7 @@ namespace Gameframe.SaveLoad
             }
             SaveLoadUtility.DeleteSavedFile(filename,folder, baseFolder);
         }
-        
+
         /// <summary>
         /// Save object to file and specify the method of save/load
         /// </summary>
@@ -217,7 +218,7 @@ namespace Gameframe.SaveLoad
             {
                 jsonData = JsonUtility.ToJson(unityObj)
             };
-            
+
             Save(savedObj,filename,folder);
         }
 
@@ -233,12 +234,12 @@ namespace Gameframe.SaveLoad
         public bool LoadUnityObjectOverwrite(UnityEngine.Object objectToOverwrite, string filename, string folder = null)
         {
             var savedObj = Load<JsonSerializedUnityObject>(filename, folder);
-            
+
             if (savedObj == null || string.IsNullOrEmpty(savedObj.jsonData))
             {
                 return false;
             }
-            
+
             JsonUtility.FromJsonOverwrite(savedObj.jsonData,objectToOverwrite);
             return true;
         }
@@ -253,7 +254,7 @@ namespace Gameframe.SaveLoad
             var jsonData = JsonUtility.ToJson(toCopy);
             JsonUtility.FromJsonOverwrite(jsonData,toOverwrite);
         }
-        
+
         /// <summary>
         /// JsonSerializedUnityObject
         /// Wrapper for json data created when using Unity's JsonUtility to serialize an object derived from UnityEngine.Object
@@ -280,7 +281,7 @@ namespace Gameframe.SaveLoad
             }
             _methods[SerializationMethodType.Custom] = customSerializationMethod;
         }
-        
+
         private ISerializationMethod GetSaveLoadMethod(SerializationMethodType methodType)
         {
             if (_methods == null)
@@ -305,14 +306,14 @@ namespace Gameframe.SaveLoad
                 case SerializationMethodType.UnityJson:
                     method = new SerializationMethodUnityJson();
                     break;
-                
+
                 case SerializationMethodType.BinaryEncrypted:
                     method = new SerializationMethodBinaryEncrypted(key,salt);
                     break;
                 case SerializationMethodType.UnityJsonEncrypted:
                     method = new SerializationMethodUnityJsonEncrypted(key,salt);
                     break;
-                
+
 #if JSON_DOT_NET
                 case SerializationMethodType.JsonDotNet:
                     method = new SerializationMethodJsonDotNet();
@@ -321,7 +322,7 @@ namespace Gameframe.SaveLoad
                     method = new SerializationMethodJsonDotNetEncrypted(key,salt);
                     break;
 #endif
-                
+
                 case SerializationMethodType.Custom:
                     throw new MissingComponentException("SerializationMethodType is Custom but no custom ISerializationMethod was found.");
                 default:
@@ -329,11 +330,9 @@ namespace Gameframe.SaveLoad
             }
 
             _methods[methodType] = method;
-            
+
             return method;
         }
-        
-    }    
+
+    }
 }
-
-
