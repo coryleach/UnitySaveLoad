@@ -105,7 +105,7 @@ namespace Gameframe.SaveLoad.Tests
 
             SaveLoadUtility.Save(testSave,serializationMethod,filename,folder);
 
-            var files = SaveLoadUtility.GetSavedFiles(folder,"sav");
+            var files = SaveLoadUtility.GetSavedFiles(folder,null, "sav");
             Assert.IsTrue(files.Length == 1);
 
             //Files should contain a list of names that exactly match the file name used
