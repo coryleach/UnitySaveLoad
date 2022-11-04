@@ -70,6 +70,7 @@ manager.LoadUnityObjectOverwrite(myScriptableObject,"MyUnityObjectData.data");
 
 ## Enable Json.Net Support
 
+This package has been tested with version 3.0.2 of the newtonsoft json package.
 Import the Netwonsoft Json package from the package manager or copy and paste the below into your package manifest.
 ```C#
 "com.unity.nuget.newtonsoft-json": "3.0.2"
