@@ -83,7 +83,7 @@ namespace Gameframe.SaveLoad.Tests
             SaveLoadUtility.Save(testSave,serializationMethod,filename,folder);
 
             var files = SaveLoadUtility.GetSavedFiles(folder);
-            Assert.IsTrue(files.Length == 1);
+            Assert.IsTrue(files.Length == 1,$"Total Save Files: {files.Length} Expected 1");
 
             //Files should contain a list of names that exactly match the file name used
             //omits the path of the file

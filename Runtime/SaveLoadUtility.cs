@@ -11,9 +11,9 @@ namespace Gameframe.SaveLoad
         private const string DefaultFolderName = "SaveLoad";
         private const string DefaultBaseFolderPath = "GameData";
 
-        public static string GetSavePath(string folderName = null, string baseFolderPath = null)
+        public static string GetSavePath(string folderName = null, string baseFolderPath = null, bool streamingAssets = false)
         {
-            return GetRuntimeSavePath(folderName, baseFolderPath);
+            return !streamingAssets ? GetRuntimeSavePath(folderName, baseFolderPath) : GetStreamingAssetsSavePath(folderName, baseFolderPath);
         }
 
         public static string GetRuntimeSavePath(string folderName = null, string baseFolderPath = null)
@@ -29,7 +29,24 @@ namespace Gameframe.SaveLoad
             }
 
             var savePath = $"{Application.persistentDataPath}/{baseFolderPath}/";
-            savePath = savePath + folderName + "/";
+            savePath = $"{savePath}{folderName}/";
+            return savePath;
+        }
+
+        public static string GetStreamingAssetsSavePath(string folderName = null, string baseFolderPath = null)
+        {
+            if (string.IsNullOrEmpty(folderName))
+            {
+                folderName = DefaultFolderName;
+            }
+
+            if (string.IsNullOrEmpty(baseFolderPath))
+            {
+                baseFolderPath = DefaultBaseFolderPath;
+            }
+
+            var savePath = $"{Application.streamingAssetsPath}/{baseFolderPath}/";
+            savePath = $"{savePath}{folderName}/";
             return savePath;
         }
 
@@ -77,10 +94,11 @@ namespace Gameframe.SaveLoad
         /// <param name="filename"></param>
         /// <param name="folderName"></param>
         /// <param name="baseFolderPath"></param>
+        /// <param name="streamingAssets"></param>
         /// <returns></returns>
-        public static object Load(System.Type objectType, ISerializationMethod serializationMethod, string filename, string folderName = null, string baseFolderPath = null)
+        public static object Load(System.Type objectType, ISerializationMethod serializationMethod, string filename, string folderName = null, string baseFolderPath = null, bool streamingAssets = false)
         {
-            var savePath = GetSavePath(folderName, baseFolderPath);
+            var savePath = GetSavePath(folderName, baseFolderPath, streamingAssets);
             var saveFilename = savePath + GetSaveFileName(filename);
 
             object returnObject = null;
@@ -104,11 +122,12 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="folderName">folder containing the save files</param>
         /// <param name="baseFolderPath">base path to the folder</param>
-        /// <param name="extension">include only files with the specified extension</param>
+        /// <param name="extension">include only files with this extension</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names</returns>
-        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null)
+        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
-            var savePath = GetSavePath(folderName,baseFolderPath);
+            var savePath = GetSavePath(folderName,baseFolderPath,streamingAssets);
 
             //If directory does not exist we're done
             if (!Directory.Exists(savePath))
@@ -126,13 +145,29 @@ namespace Gameframe.SaveLoad
         /// <summary>
         /// Creates an array list of save files in the given folder and path
         /// </summary>
-        /// <param name="folderName">folder containing the save files</param>
-        /// <param name="baseFolderPath">base path to the folder</param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
         /// <param name="extension">include only files with this extension</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>Array of file names</returns>
-        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null)
+        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
-            return EnumerateSavedFiles(folderName, baseFolderPath, extension).ToArray();
+            return EnumerateSavedFiles(folderName, baseFolderPath, extension, streamingAssets).ToArray();
+        }
+
+        /// <summary>
+        /// Populates a given array with a list of save files in the given folder and path
+        /// </summary>
+        /// <param name="list">list to be populated with file names</param>
+        /// <param name="folderName"></param>
+        /// <param name="baseFolderPath"></param>
+        /// <param name="extension">include only files with this extension</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
+        /// <returns>Array of file names</returns>
+        public static void GetSavedFiles(List<string> list, string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
+        {
+            list.Clear();
+            list.AddRange(EnumerateSavedFiles(folderName, baseFolderPath, extension streamingAssets));
         }
 
         /// <summary>
