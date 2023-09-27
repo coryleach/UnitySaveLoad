@@ -82,7 +82,7 @@ In player settings add the string 'JSON_DOT_NET' to Scripting Define Symbols.
 
 👤 **Cory Leach**
 
-* Twitter: [@coryleach](https://twitter.com/coryleach)
+* Mastodon: [@coryleach@mastodon.gamedev.place](https://mastodon.gamedev.place/@coryleach)
 * Github: [@coryleach](https://github.com/coryleach)
 
 
