@@ -77,15 +77,34 @@ namespace Gameframe.SaveLoad
         /// Gets the list of save files that have been created
         /// </summary>
         /// <param name="folder">sub folder</param>
-        /// <param name="extension">include only files with this extension</param>
+        /// <param name="extension"></param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
-        public string[] GetFiles(string folder = null, string extension = null)
+        public string[] GetFiles(string folder = null, string extension = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
-            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, extension);
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, extension, streamingAssets);
+        }
+
+        /// <summary>
+        /// Gets the list of save files that have been created
+        /// </summary>
+        /// <param name="list">list to be populated with file names</param>
+        /// <param name="folder">sub folder</param>
+        /// <param name="extension"></param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
+        /// <returns>list of file names (excludes the path)</returns>
+        public void GetFiles(List<string> list, string folder = null, string extension = null, bool streamingAssets = false)
+        {
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
+
+            SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, extension, streamingAssets);
         }
 
         /// <summary>
@@ -126,11 +145,12 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="filename">Name of file to load from</param>
         /// <param name="folder">Name of folder containing the file</param>
+        /// <param name="streamingAssets">Load file from streaming assets</param>
         /// <typeparam name="T">Type of object to be loaded from file</typeparam>
         /// <returns>Instance of object loaded from file</returns>
-        public T Load<T>(string filename, string folder = null)
+        public T Load<T>(string filename, string folder = null, bool streamingAssets = false)
         {
-            return (T)Load(typeof(T), filename, folder);
+            return (T)Load(typeof(T), filename, folder, streamingAssets);
         }
 
         /// <summary>
@@ -139,15 +159,16 @@ namespace Gameframe.SaveLoad
         /// <param name="type">Type of object to be loaded</param>
         /// <param name="filename">Name of file to load object from</param>
         /// <param name="folder">Name of folder containing the file to be loaded</param>
+        /// <param name="streamingAssets">Load file from streaming assets</param>
         /// <returns>Instance of object to be loaded. Null if file did not exist.</returns>
-        public object Load(Type type, string filename, string folder = null)
+        public object Load(Type type, string filename, string folder = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
-            return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder, baseFolder);
+            return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder, baseFolder, streamingAssets);
         }
 
         /// <summary>
