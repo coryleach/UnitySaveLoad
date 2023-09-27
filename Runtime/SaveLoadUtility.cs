@@ -122,9 +122,10 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="folderName">folder containing the save files</param>
         /// <param name="baseFolderPath">base path to the folder</param>
+        /// <param name="extension">include only files with this extension</param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names</returns>
-        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null, bool streamingAssets = false)
+        public static IEnumerable<string> EnumerateSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
             var savePath = GetSavePath(folderName,baseFolderPath,streamingAssets);
 
@@ -134,7 +135,8 @@ namespace Gameframe.SaveLoad
                 yield break;
             }
 
-            foreach ( var file in Directory.EnumerateFiles(savePath,"*",SearchOption.AllDirectories) )
+            var searchPattern = string.IsNullOrEmpty(extension) ? "*" : $"*.{extension}";
+            foreach ( var file in Directory.EnumerateFiles(savePath,searchPattern,SearchOption.AllDirectories) )
             {
                 yield return Path.GetFileName(file);
             }
@@ -145,11 +147,12 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="folderName"></param>
         /// <param name="baseFolderPath"></param>
+        /// <param name="extension">include only files with this extension</param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>Array of file names</returns>
-        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null, bool streamingAssets = false)
+        public static string[] GetSavedFiles(string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
-            return EnumerateSavedFiles(folderName, baseFolderPath).ToArray();
+            return EnumerateSavedFiles(folderName, baseFolderPath, extension, streamingAssets).ToArray();
         }
 
         /// <summary>
@@ -158,12 +161,13 @@ namespace Gameframe.SaveLoad
         /// <param name="list">list to be populated with file names</param>
         /// <param name="folderName"></param>
         /// <param name="baseFolderPath"></param>
+        /// <param name="extension">include only files with this extension</param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>Array of file names</returns>
-        public static void GetSavedFiles(List<string> list, string folderName = null, string baseFolderPath = null, bool streamingAssets = false)
+        public static void GetSavedFiles(List<string> list, string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
             list.Clear();
-            list.AddRange(EnumerateSavedFiles(folderName, baseFolderPath, streamingAssets));
+            list.AddRange(EnumerateSavedFiles(folderName, baseFolderPath, extension streamingAssets));
         }
 
         /// <summary>

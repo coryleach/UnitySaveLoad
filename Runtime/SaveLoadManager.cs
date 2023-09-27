@@ -101,6 +101,7 @@ namespace Gameframe.SaveLoad
             {
                 folder = defaultFolder;
             }
+            
             SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, streamingAssets);
         }
 
