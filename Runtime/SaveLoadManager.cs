@@ -13,18 +13,18 @@ namespace Gameframe.SaveLoad
     {
         [Header("Settings"),SerializeField] private string defaultFolder = "SaveData";
         public string DefaultFolder => defaultFolder;
-        
+
         [SerializeField] private string baseFolder = "GameData";
         public string BaseFolder => baseFolder;
-        
+
         [SerializeField] private SerializationMethodType saveMethod = SerializationMethodType.Default;
 
         [Header("Encryption"),SerializeField] protected string key = string.Empty;
         public string Key => key;
-        
+
         [SerializeField] protected string salt = string.Empty;
         public string Salt => salt;
-        
+
         private Dictionary<SerializationMethodType, ISerializationMethod> _methods;
 
         private void OnEnable()
@@ -53,10 +53,10 @@ namespace Gameframe.SaveLoad
             instance.key = key;
             instance.salt = salt;
             instance.saveMethod = saveMethod;
-            
+
             return instance;
         }
-        
+
         /// <summary>
         /// Save an object to disk
         /// </summary>
@@ -77,14 +77,31 @@ namespace Gameframe.SaveLoad
         /// Gets the list of save files that have been created
         /// </summary>
         /// <param name="folder">sub folder</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
-        public string[] GetFiles(string folder = null)
+        public string[] GetFiles(string folder = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
-            return SaveLoadUtility.GetSavedFiles(folder,baseFolder);
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, streamingAssets);
+        }
+
+        /// <summary>
+        /// Gets the list of save files that have been created
+        /// </summary>
+        /// <param name="list">list to be populated with file names</param>
+        /// <param name="folder">sub folder</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
+        /// <returns>list of file names (excludes the path)</returns>
+        public void GetFiles(List<string> list, string folder = null, bool streamingAssets = false)
+        {
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
+            SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, streamingAssets);
         }
 
         /// <summary>
@@ -119,17 +136,18 @@ namespace Gameframe.SaveLoad
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
             return (T)saveLoadMethod.Copy(obj);
         }
-        
+
         /// <summary>
         /// Load an object from disk
         /// </summary>
         /// <param name="filename">Name of file to load from</param>
         /// <param name="folder">Name of folder containing the file</param>
+        /// <param name="streamingAssets">Load file from streaming assets</param>
         /// <typeparam name="T">Type of object to be loaded from file</typeparam>
         /// <returns>Instance of object loaded from file</returns>
-        public T Load<T>(string filename, string folder = null)
+        public T Load<T>(string filename, string folder = null, bool streamingAssets = false)
         {
-            return (T)Load(typeof(T), filename, folder);
+            return (T)Load(typeof(T), filename, folder, streamingAssets);
         }
 
         /// <summary>
@@ -138,15 +156,16 @@ namespace Gameframe.SaveLoad
         /// <param name="type">Type of object to be loaded</param>
         /// <param name="filename">Name of file to load object from</param>
         /// <param name="folder">Name of folder containing the file to be loaded</param>
+        /// <param name="streamingAssets">Load file from streaming assets</param>
         /// <returns>Instance of object to be loaded. Null if file did not exist.</returns>
-        public object Load(Type type, string filename, string folder = null)
+        public object Load(Type type, string filename, string folder = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
-            return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder, baseFolder);
+            return SaveLoadUtility.Load(type, saveLoadMethod,filename,folder, baseFolder, streamingAssets);
         }
 
         /// <summary>
@@ -162,7 +181,7 @@ namespace Gameframe.SaveLoad
             }
             SaveLoadUtility.DeleteSavedFile(filename,folder, baseFolder);
         }
-        
+
         /// <summary>
         /// Save object to file and specify the method of save/load
         /// </summary>
@@ -217,7 +236,7 @@ namespace Gameframe.SaveLoad
             {
                 jsonData = JsonUtility.ToJson(unityObj)
             };
-            
+
             Save(savedObj,filename,folder);
         }
 
@@ -233,12 +252,12 @@ namespace Gameframe.SaveLoad
         public bool LoadUnityObjectOverwrite(UnityEngine.Object objectToOverwrite, string filename, string folder = null)
         {
             var savedObj = Load<JsonSerializedUnityObject>(filename, folder);
-            
+
             if (savedObj == null || string.IsNullOrEmpty(savedObj.jsonData))
             {
                 return false;
             }
-            
+
             JsonUtility.FromJsonOverwrite(savedObj.jsonData,objectToOverwrite);
             return true;
         }
@@ -253,7 +272,7 @@ namespace Gameframe.SaveLoad
             var jsonData = JsonUtility.ToJson(toCopy);
             JsonUtility.FromJsonOverwrite(jsonData,toOverwrite);
         }
-        
+
         /// <summary>
         /// JsonSerializedUnityObject
         /// Wrapper for json data created when using Unity's JsonUtility to serialize an object derived from UnityEngine.Object
@@ -280,7 +299,7 @@ namespace Gameframe.SaveLoad
             }
             _methods[SerializationMethodType.Custom] = customSerializationMethod;
         }
-        
+
         private ISerializationMethod GetSaveLoadMethod(SerializationMethodType methodType)
         {
             if (_methods == null)
@@ -305,14 +324,14 @@ namespace Gameframe.SaveLoad
                 case SerializationMethodType.UnityJson:
                     method = new SerializationMethodUnityJson();
                     break;
-                
+
                 case SerializationMethodType.BinaryEncrypted:
                     method = new SerializationMethodBinaryEncrypted(key,salt);
                     break;
                 case SerializationMethodType.UnityJsonEncrypted:
                     method = new SerializationMethodUnityJsonEncrypted(key,salt);
                     break;
-                
+
 #if JSON_DOT_NET
                 case SerializationMethodType.JsonDotNet:
                     method = new SerializationMethodJsonDotNet();
@@ -321,7 +340,7 @@ namespace Gameframe.SaveLoad
                     method = new SerializationMethodJsonDotNetEncrypted(key,salt);
                     break;
 #endif
-                
+
                 case SerializationMethodType.Custom:
                     throw new MissingComponentException("SerializationMethodType is Custom but no custom ISerializationMethod was found.");
                 default:
@@ -329,11 +348,9 @@ namespace Gameframe.SaveLoad
             }
 
             _methods[methodType] = method;
-            
+
             return method;
         }
-        
-    }    
+
+    }
 }
-
-
