@@ -77,15 +77,16 @@ namespace Gameframe.SaveLoad
         /// Gets the list of save files that have been created
         /// </summary>
         /// <param name="folder">sub folder</param>
+        /// <param name="extension"></param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
-        public string[] GetFiles(string folder = null, bool streamingAssets = false)
+        public string[] GetFiles(string folder = null, string extension = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
-            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, streamingAssets);
+            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, extension, streamingAssets);
         }
 
         /// <summary>
@@ -93,16 +94,17 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="list">list to be populated with file names</param>
         /// <param name="folder">sub folder</param>
+        /// <param name="extension"></param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
-        public void GetFiles(List<string> list, string folder = null, bool streamingAssets = false)
+        public void GetFiles(List<string> list, string folder = null, string extension = null, bool streamingAssets = false)
         {
             if (string.IsNullOrEmpty(folder))
             {
                 folder = defaultFolder;
             }
-            
-            SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, streamingAssets);
+
+            SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, extension, streamingAssets);
         }
 
         /// <summary>

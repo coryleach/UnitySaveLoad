@@ -167,7 +167,7 @@ namespace Gameframe.SaveLoad
         public static void GetSavedFiles(List<string> list, string folderName = null, string baseFolderPath = null, string extension = null, bool streamingAssets = false)
         {
             list.Clear();
-            list.AddRange(EnumerateSavedFiles(folderName, baseFolderPath, extension streamingAssets));
+            list.AddRange(EnumerateSavedFiles(folderName, baseFolderPath, extension, streamingAssets));
         }
 
         /// <summary>
