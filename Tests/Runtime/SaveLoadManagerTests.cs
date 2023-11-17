@@ -24,14 +24,14 @@ namespace Gameframe.SaveLoad.Tests
             public Vector3 pt;
             public Quaternion rot;
         }
-        
+
         [Serializable]
         public class SaveLoadDictionaryTestObject
         {
             public Dictionary<string, int> dict = new Dictionary<string, int>();
             public string name = "";
         }
-        
+
         private static readonly string BaseDirectory = "GameData";
         private static readonly string SaveDirectory = "SaveData";
         private static readonly string TestEncryptionKey = "SaveLoadTestEncryptionKey";
@@ -57,19 +57,19 @@ namespace Gameframe.SaveLoad.Tests
                 File.Delete(filepath);
             }
         }
-        
+
         [SetUp]
         public void Setup()
         {
             CleanupFiles();
         }
-        
+
         [TearDown]
         public void Teardown()
         {
             CleanupFiles();
         }
-        
+
         [Test]
         public void CanCreateManager([Values] SerializationMethodType method)
         {
@@ -90,18 +90,25 @@ namespace Gameframe.SaveLoad.Tests
             };
 
             const string filename = "Testfile";
-            
+
             manager.Save(testObject,filename);
 
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
-            
+
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(manager);
         }
-        
+
+        [Test]
+        public void GetPath([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+            Debug.Log(manager.GetPath("MyFile.sav"));
+        }
+
         [Test]
         public void GetFiles([Values] SerializationMethodType method)
         {
@@ -114,7 +121,7 @@ namespace Gameframe.SaveLoad.Tests
             };
 
             const string filename = "Testfile";
-            
+
             manager.Save(testObject,filename);
 
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
@@ -123,15 +130,15 @@ namespace Gameframe.SaveLoad.Tests
             var files = manager.GetFiles();
             Assert.IsTrue(files.Length == 1,$"Expected 1 file but found {files.Length}");
             Assert.IsTrue(files[0] == filename);
-            
+
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(manager);
         }
 
-        
-        
+
+
         [Test]
         public void CanSaveAndLoad([Values] SerializationMethodType method)
         {
@@ -144,29 +151,29 @@ namespace Gameframe.SaveLoad.Tests
             };
 
             const string filename = "Testfile";
-            
+
             manager.Save(testObject,filename);
 
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             var loadedObject = manager.Load<SaveLoadTestObject>(filename);
-            
+
             Assert.IsTrue(loadedObject.listOfStrings.Count == testObject.listOfStrings.Count);
 
             for (int i = 0; i < testObject.listOfStrings.Count; i++)
             {
                 Assert.IsTrue(testObject.listOfStrings[i] == loadedObject.listOfStrings[i]);
             }
-            
+
             Assert.IsTrue(testObject.count == loadedObject.count);
-            
+
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(manager);
         }
-        
+
         [Test]
         public void CanCopy([Values] SerializationMethodType method)
         {
@@ -179,7 +186,7 @@ namespace Gameframe.SaveLoad.Tests
             };
 
             var loadedObject = manager.Copy(testObject);
-            
+
             Assert.NotNull(loadedObject);
             Assert.IsFalse(ReferenceEquals(testObject,loadedObject));
             Assert.NotNull(loadedObject.listOfStrings);
@@ -189,12 +196,12 @@ namespace Gameframe.SaveLoad.Tests
             {
                 Assert.IsTrue(testObject.listOfStrings[i] == loadedObject.listOfStrings[i]);
             }
-            
+
             Assert.IsTrue(testObject.count == loadedObject.count);
-            
+
             Object.Destroy(manager);
         }
-        
+
         [Test]
         public void LoadReturnsNullWhenFileDoesnotExist([Values] SerializationMethodType method)
         {
@@ -203,7 +210,7 @@ namespace Gameframe.SaveLoad.Tests
 
             var loadedObject = manager.Load<SaveLoadTestObject>(filename);
             Assert.IsTrue(loadedObject == null);
-            
+
             Object.Destroy(manager);
         }
 
@@ -218,17 +225,17 @@ namespace Gameframe.SaveLoad.Tests
             testObj.textValue = "MyValue";
 
             manager.SaveUnityObject(testObj,filename);
-           
+
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
-            
+
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(testObj);
             Object.Destroy(manager);
         }
-        
+
         [Test]
         public void CanSaveLoadUnityObject([Values] SerializationMethodType method)
         {
@@ -241,16 +248,16 @@ namespace Gameframe.SaveLoad.Tests
             testObj.textValue = "MyValue";
 
             manager.SaveUnityObject(testObj,filename);
-           
+
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
-            
+
             manager.LoadUnityObjectOverwrite(loadedTestObj,filename);
             Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
-            
+
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(testObj);
             Object.Destroy(loadedTestObj);
             Object.Destroy(manager);
@@ -264,16 +271,16 @@ namespace Gameframe.SaveLoad.Tests
             var loadedTestObj = ScriptableObject.CreateInstance<SaveLoadTestUnityObject>();
 
             testObj.textValue = "MyValue";
-            
+
             manager.CopyUnityObjectOverwrite(testObj,loadedTestObj);
 
             Assert.IsTrue(loadedTestObj.textValue == testObj.textValue);
-            
+
             Object.Destroy(testObj);
             Object.Destroy(loadedTestObj);
             Object.Destroy(manager);
         }
-        
+
         [Test]
         public void CopyThrowsArgumentExceptionOnUnityObject([Values] SerializationMethodType method)
         {
@@ -284,7 +291,7 @@ namespace Gameframe.SaveLoad.Tests
             {
                 manager.Copy(testObj);
             });
-            
+
             Object.Destroy(testObj);
             Object.Destroy(manager);
         }
@@ -305,21 +312,21 @@ namespace Gameframe.SaveLoad.Tests
             {
                 dict = new Dictionary<string,int>
                 {
-                    {"one", 1}, 
+                    {"one", 1},
                     {"two", 2}
                 },
                 name = "Test",
             };
 
             const string filename = "Testfile";
-            
+
             manager.Save(testObject,filename);
 
             var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             var loadedObject = manager.Load<SaveLoadDictionaryTestObject>(filename);
-            
+
             Assert.IsTrue(loadedObject.name == testObject.name);
             Assert.IsTrue(loadedObject.dict.Count == testObject.dict.Count);
             Assert.IsTrue(loadedObject.dict.ContainsKey("one"));
@@ -329,9 +336,9 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.DeleteSave(filename);
             Assert.IsFalse(File.Exists(filepath));
-            
+
             Object.Destroy(manager);
         }
-        
+
     }
 }
