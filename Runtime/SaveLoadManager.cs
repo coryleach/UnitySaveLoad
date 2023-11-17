@@ -144,12 +144,16 @@ namespace Gameframe.SaveLoad
         /// Get the full path to a save file
         /// </summary>
         /// <param name="filename">Name of file</param>
-        /// <param name="folderName">Name of folder containing file</param>
+        /// <param name="folder">Name of folder containing file</param>
         /// <param name="streamingAssets">true if saves are from streaming assets</param>
         /// <returns>full path to the file on disk</returns>
-        public string GetPath(string filename, string folderName = null, bool streamingAssets = false)
+        public string GetPath(string filename, string folder = null, bool streamingAssets = false)
         {
-            var savePath = SaveLoadUtility.GetSavePath(folderName, baseFolder, streamingAssets);
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
+            var savePath = SaveLoadUtility.GetSavePath(folder, baseFolder, streamingAssets);
             var saveFilename = savePath + filename;
             return saveFilename;
         }
