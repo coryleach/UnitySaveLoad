@@ -70,14 +70,14 @@ namespace Gameframe.SaveLoad
                 folder = defaultFolder;
             }
             var saveLoadMethod = GetSaveLoadMethod(saveMethod);
-            SaveLoadUtility.Save(obj,saveLoadMethod,filename,folder, baseFolder);
+            SaveLoadUtility.Save(obj, saveLoadMethod, filename, folder, baseFolder);
         }
 
         /// <summary>
         /// Gets the list of save files that have been created
         /// </summary>
         /// <param name="folder">sub folder</param>
-        /// <param name="extension"></param>
+        /// <param name="extension">filter for files only with this extension if provided. Do not include the '.' in the string.</param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
         public string[] GetFiles(string folder = null, string extension = null, bool streamingAssets = false)
@@ -86,7 +86,7 @@ namespace Gameframe.SaveLoad
             {
                 folder = defaultFolder;
             }
-            return SaveLoadUtility.GetSavedFiles(folder,baseFolder, extension, streamingAssets);
+            return SaveLoadUtility.GetSavedFiles(folder, baseFolder, extension, streamingAssets);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Gameframe.SaveLoad
         /// </summary>
         /// <param name="list">list to be populated with file names</param>
         /// <param name="folder">sub folder</param>
-        /// <param name="extension"></param>
+        /// <param name="extension">filter for files only with this extension if provided. Do not include the '.' in the string.</param>
         /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
         /// <returns>list of file names (excludes the path)</returns>
         public void GetFiles(List<string> list, string folder = null, string extension = null, bool streamingAssets = false)
@@ -103,8 +103,23 @@ namespace Gameframe.SaveLoad
             {
                 folder = defaultFolder;
             }
-
-            SaveLoadUtility.GetSavedFiles(list, folder,baseFolder, extension, streamingAssets);
+            SaveLoadUtility.GetSavedFiles(list, folder, baseFolder, extension, streamingAssets);
+        }
+        
+        /// <summary>
+        /// Checks if a given save file 
+        /// </summary>
+        /// <param name="filename">name of the file to be checked</param>
+        /// <param name="folder">subfolder within the base folder if any</param>
+        /// <param name="streamingAssets">Will use Application.streamingAssetsPath as base path if true otherwise Application.persistentDataPath</param>
+        /// <returns>True if file exists, false otherwise</returns>
+        public bool Exists(string filename, string folder = null, bool streamingAssets = false)
+        {
+            if (string.IsNullOrEmpty(folder))
+            {
+                folder = defaultFolder;
+            }
+            return SaveLoadUtility.Exists(filename, folder, baseFolder, streamingAssets);
         }
 
         /// <summary>

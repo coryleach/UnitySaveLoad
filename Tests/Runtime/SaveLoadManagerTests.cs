@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -33,13 +34,13 @@ namespace Gameframe.SaveLoad.Tests
         }
 
         private static readonly string BaseDirectory = "GameData";
-        private static readonly string SaveDirectory = "SaveData";
+        private static readonly string SubfolderDirectory = "SaveData";
         private static readonly string TestEncryptionKey = "SaveLoadTestEncryptionKey";
         private static readonly string TestEncryptionSalt = "SaveLoadTestEncryptionSalt";
 
         private static SaveLoadManager CreateManager(SerializationMethodType method = SerializationMethodType.Default)
         {
-            var manager = SaveLoadManager.Create(BaseDirectory,SaveDirectory,method,TestEncryptionKey, TestEncryptionSalt);
+            var manager = SaveLoadManager.Create(BaseDirectory,SubfolderDirectory,method,TestEncryptionKey, TestEncryptionSalt);
             if (method == SerializationMethodType.Custom)
             {
                 manager.SetCustomSerializationMethod(new SerializationMethodUnityJson());
@@ -51,7 +52,7 @@ namespace Gameframe.SaveLoad.Tests
         {
             //Cleaning up some files that were made by tests
             const string filename = "Testfile";
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             if (File.Exists(filepath))
             {
                 File.Delete(filepath);
@@ -93,7 +94,7 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.Save(testObject,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             manager.DeleteSave(filename);
@@ -124,11 +125,40 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.Save(testObject,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             var files = manager.GetFiles();
-            Assert.IsTrue(files.Length == 1,$"Expected 1 file but found {files.Length}");
+            Assert.IsTrue(files.Length == 1,$"Expected 1 file but found {files.Length}. {files.DumpContentsToString()}");
+            Assert.IsTrue(files[0] == filename);
+
+            manager.DeleteSave(filename);
+            Assert.IsFalse(File.Exists(filepath));
+
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void GetFilesList([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+
+            var testObject = new SaveLoadTestObject()
+            {
+                listOfStrings = new List<string> {"one", "two"},
+                count = 10,
+            };
+
+            const string filename = "Testfile";
+
+            manager.Save(testObject,filename);
+
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
+            Assert.IsTrue(File.Exists(filepath));
+
+            var files = new List<string>();
+            manager.GetFiles(files);
+            Assert.IsTrue(files.Count == 1,$"Expected 1 file but found {files.Count}");
             Assert.IsTrue(files[0] == filename);
 
             manager.DeleteSave(filename);
@@ -137,7 +167,115 @@ namespace Gameframe.SaveLoad.Tests
             Object.Destroy(manager);
         }
 
+        [Test]
+        public void GetFilesExtensionFilteringWithFilter([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
 
+            var testObject = new SaveLoadTestObject()
+            {
+                listOfStrings = new List<string> {"one", "two"},
+                count = 10,
+            };
+
+            const string filename1 = "AutoSave";
+            const string filename2 = "Save0001.sav";
+
+            manager.Save(testObject,filename1);
+            manager.Save(testObject,filename2);
+
+            var filepath1 = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename1}";
+            Assert.IsTrue(File.Exists(filepath1));
+
+            var filepath2 = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename2}";
+            Assert.IsTrue(File.Exists(filepath2));
+            
+            var files = new List<string>();
+            manager.GetFiles(files, extension: "sav");
+            Assert.IsTrue(files.Count == 1,$"Expected 1 file but found {files.Count}. {files}");
+            Assert.IsTrue(files[0] == filename2);
+
+            manager.DeleteSave(filename1);
+            Assert.IsFalse(File.Exists(filepath1));
+
+            manager.DeleteSave(filename2);
+            Assert.IsFalse(File.Exists(filepath2));
+            
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void GetFilesExtensionFilteringNoFilter([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+
+            var testObject = new SaveLoadTestObject()
+            {
+                listOfStrings = new List<string> {"one", "two"},
+                count = 10,
+            };
+
+            const string filename1 = "AutoSave";
+            const string filename2 = "Save0001.sav";
+
+            manager.Save(testObject,filename1);
+            manager.Save(testObject,filename2);
+
+            var filepath1 = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename1}";
+            Assert.IsTrue(File.Exists(filepath1));
+
+            var filepath2 = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename2}";
+            Assert.IsTrue(File.Exists(filepath2));
+            
+            var files = new List<string>();
+            manager.GetFiles(files);
+            Assert.IsTrue(files.Count == 2,$"Expected 2 files but found {files.Count}");
+            Assert.IsTrue(files.Contains(filename1));
+            Assert.IsTrue(files.Contains(filename2));
+
+            manager.DeleteSave(filename1);
+            Assert.IsFalse(File.Exists(filepath1));
+
+            manager.DeleteSave(filename2);
+            Assert.IsFalse(File.Exists(filepath2));
+            
+            Object.Destroy(manager);
+        }
+        
+        [Test]
+        public void Exists([Values] SerializationMethodType method)
+        {
+            var manager = CreateManager(method);
+
+            var testObject = new SaveLoadTestObject()
+            {
+                listOfStrings = new List<string> {"one", "two"},
+                count = 10,
+            };
+
+            const string filename1 = "AutoSave";
+            const string filename2 = "Save0001.sav";
+
+            manager.Save(testObject,filename1);
+            manager.Save(testObject,filename2);
+
+            var path1 = manager.GetPath(filename1);
+            var path2 = manager.GetPath(filename2);
+            
+            Assert.IsTrue(File.Exists(path1));
+            Assert.IsTrue(File.Exists(path2));
+            
+            Assert.IsTrue(manager.Exists(filename1));
+            Assert.IsTrue(manager.Exists(filename2));
+            
+            manager.DeleteSave(filename1);
+            Assert.IsFalse(manager.Exists(filename1));
+
+            manager.DeleteSave(filename2);
+            Assert.IsFalse(manager.Exists(filename2));
+            
+            Object.Destroy(manager);
+        }
 
         [Test]
         public void CanSaveAndLoad([Values] SerializationMethodType method)
@@ -154,7 +292,7 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.Save(testObject,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             var loadedObject = manager.Load<SaveLoadTestObject>(filename);
@@ -226,7 +364,7 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.SaveUnityObject(testObj,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             manager.DeleteSave(filename);
@@ -249,7 +387,7 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.SaveUnityObject(testObj,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             manager.LoadUnityObjectOverwrite(loadedTestObj,filename);
@@ -322,7 +460,7 @@ namespace Gameframe.SaveLoad.Tests
 
             manager.Save(testObject,filename);
 
-            var filepath = $"{SaveLoadUtility.GetSavePath(SaveDirectory, BaseDirectory)}/{filename}";
+            var filepath = $"{SaveLoadUtility.GetSavePath(SubfolderDirectory, BaseDirectory)}/{filename}";
             Assert.IsTrue(File.Exists(filepath));
 
             var loadedObject = manager.Load<SaveLoadDictionaryTestObject>(filename);
@@ -340,5 +478,22 @@ namespace Gameframe.SaveLoad.Tests
             Object.Destroy(manager);
         }
 
+        
     }
+
+    static class StringListExtensions
+    {
+        public static string DumpContentsToString(this IEnumerable<string> strings)
+        {
+            var builder = new StringBuilder();
+            builder.Append("[");
+            foreach (var str in strings)
+            {
+                builder.AppendFormat("{0} ", str);
+            }
+            builder.Append("]");
+            return builder.ToString();
+        }
+    }
+    
 }
